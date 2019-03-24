@@ -63,8 +63,3 @@ Also you can merge several ini data to one by:
 <pre>
 ini.merge(iniMegreWith);
 </pre>
-
-
-
-
-

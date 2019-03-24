@@ -1,6 +1,7 @@
 package ru.ancevt.util.ini;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -82,6 +83,11 @@ public class TestIni {
 	@Test
 	public void testBoolean() {
 		assertTrue(ini.getBoolean(null, "boolean", false));
+	}
+	
+	@Test
+	public void testInvalidBoolean() {
+		assertFalse(ini.getBoolean(null, "timeout", false));
 	}
 	
 	@Test
@@ -183,6 +189,7 @@ public class TestIni {
 		ini.removeSection("SECTION1");
 		assertEquals(1, ini.getSectionCount());
 	}
+	
 	
 }
 
