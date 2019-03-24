@@ -35,7 +35,7 @@ currentRateAPISignError=/v4/esb/rate/error
 </pre>
 
 ... and put it in a variable 'sourceIniData'.
-Then we can access data from it. Few examples how to do it:
+Then we can access data from it. Several examples how to do it:
 <pre>
 Ini ini = new Ini(sourceIniData);
 
@@ -58,7 +58,7 @@ ini.getSection("ELF").effectiveSize(); // returns 5 excluding the comment
 
 Examine other API in class Ini.java.
 You can add/remove lines, sections, comments, define comment char to ";" or "#", turn on and turn off ignoring case e.t.c
-Also you can merge few ini data to one by:
+Also you can merge several ini data to one by:
 
 <pre>
 ini.merge(iniMegreWith);
