@@ -35,7 +35,7 @@ currentRateAPISignError=/v4/esb/rate/error
 </pre>
 
 ... and put it in a variable 'sourceIniData'.
-Then how to access data from it. Few examples how to use it:
+Then we can access data from it. Few examples how to do it:
 <pre>
 Ini ini = new Ini(sourceIniData);
 
