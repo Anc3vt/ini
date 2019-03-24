@@ -52,7 +52,7 @@ ini.addLine("ELF", "newLine", "123");
 ini.removeSection("ELF");
 
 // Size of sections:
-ini.getSection("ELF").size(); // returns 6 inluding the comment
+ini.getSection("ELF").size(); // returns 6 including the comment
 ini.getSection("ELF").effectiveSize(); // returns 5 excluding the comment 
 </pre>
 
