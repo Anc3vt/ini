@@ -1,5 +1,5 @@
 # ini
-Java ini parsing &amp; data accessing instrument 
+<h3>Java ini parsing &amp; data accessing instrument </h3>
 
 Usage:
 
