@@ -13,12 +13,12 @@ public class Ini {
     public Ini() {
         commentChar = IniChar.COMMENT_DEFAULT;
         globalSection = new IniSection(true);
-        sections = new ArrayList<IniSection>();
+        sections = new ArrayList<>();
     }
 
     public Ini(String sourceIniData) {
         this();
-        setSourceData(sourceIniData);
+        setData(sourceIniData);
     }
 
     public final void merge(Ini ini) {
@@ -61,15 +61,15 @@ public class Ini {
         return commentChar;
     }
 
-    public final void setSourceData(String sourceIniData) {
+    public final void setData(String sourceIniData) {
         clear();
         final IniParser parser = new IniParser();
         parser.parse(this, sourceIniData);
     }
 
-    //public final String getSourceData() {
-    //    return this.stringify(getCommentChar(), false);
-    //}
+    public final String getData() {
+        return this.stringify(getCommentChar(), false);
+    }
 
     public final void clear() {
         getGlobalSection().clear();
@@ -129,9 +129,9 @@ public class Ini {
             stringBuilder.append(globalSection.stringify(commentChar, unixEndLine));
         }
 
-        for (final IniSection s : sections) {
+        sections.stream().forEach((s) -> {
             stringBuilder.append(s.stringify(commentChar, unixEndLine));
-        }
+        });
 
         return stringBuilder.toString();
     }
@@ -163,19 +163,16 @@ public class Ini {
     public final boolean hasSection(String sectionName) {
         return getSection(sectionName) != null;
     }
-    
+
     public final boolean hasKey(String sectionName, String key) {
         final IniSection section = sectionName == null ? getGlobalSection() : getSection(sectionName);
-        if(section == null) {
+        if (section == null) {
             return false;
         }
         IniSection.ignoreCase = ignoreCase;
         final IniLine line = section.getLine(key);
         IniSection.ignoreCase = false;
-        if (line == null) {
-            return false;
-        }
-        return true;
+        return line != null;
     }
 
     public final String getString(String sectionName, String key) {
@@ -285,9 +282,9 @@ public class Ini {
     public final void clearEmpty() {
         getGlobalSection().clearEmpty();
 
-        for (final IniSection s : sections) {
+        sections.stream().forEach((s) -> {
             s.clearEmpty();
-        }
+        });
     }
 
 }
