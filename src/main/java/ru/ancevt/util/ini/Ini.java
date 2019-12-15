@@ -67,9 +67,9 @@ public class Ini {
         parser.parse(this, sourceIniData);
     }
 
-    public final String getSourceData() {
-        return this.stringify(getCommentChar());
-    }
+    //public final String getSourceData() {
+    //    return this.stringify(getCommentChar(), false);
+    //}
 
     public final void clear() {
         getGlobalSection().clear();
@@ -122,22 +122,22 @@ public class Ini {
         removeSection(getSection(sectionName));
     }
 
-    public final String stringify(char commentChar) {
+    public final String stringify(char commentChar, boolean unixEndLine) {
         final StringBuilder stringBuilder = new StringBuilder();
 
         if (!globalSection.isEmpty()) {
-            stringBuilder.append(globalSection.stringify(commentChar));
+            stringBuilder.append(globalSection.stringify(commentChar, unixEndLine));
         }
 
         for (final IniSection s : sections) {
-            stringBuilder.append(s.stringify(commentChar));
+            stringBuilder.append(s.stringify(commentChar, unixEndLine));
         }
 
         return stringBuilder.toString();
     }
 
     public final String stringify() {
-        return stringify(IniChar.COMMENT_DEFAULT);
+        return stringify(IniChar.COMMENT_DEFAULT, false);
     }
 
     public final void addLine(String key, String value) {

@@ -174,21 +174,21 @@ public class IniSection {
         this.name = name;
     }
 
-    public final String stringify(char commentChar) {
+    public final String stringify(char commentChar, boolean unixEndLine) {
         final StringBuilder stringBuilder = new StringBuilder();
 
         if (!isGlobal()) {
-            stringBuilder.append(IniChar.OPEN_BRACE).append(getName()).append(IniChar.CLOSE_BRRACE).append(IniChar.BR);
+            stringBuilder.append(IniChar.OPEN_BRACE).append(getName()).append(IniChar.CLOSE_BRRACE).append(unixEndLine ? IniChar.END_LINE : IniChar.BR);
         }
 
         for (final IniLine l : lines) {
-            stringBuilder.append(l.stringify(commentChar)).append(IniChar.BR);
+            stringBuilder.append(l.stringify(commentChar)).append(unixEndLine ? IniChar.END_LINE : IniChar.BR);
         }
 
         return stringBuilder.toString();
     }
 
     public final String stringify() {
-        return stringify(IniChar.COMMENT_DEFAULT);
+        return stringify(IniChar.COMMENT_DEFAULT, false);
     }
 }
