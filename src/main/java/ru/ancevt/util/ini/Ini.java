@@ -60,6 +60,21 @@ public class Ini {
     public final char getCommentChar() {
         return commentChar;
     }
+    
+    public final void set(String section, String key, String value) {
+        IniSection s = getSection(section);
+        if(s == null) {
+            s = getGlobalSection();
+        }
+        
+        IniLine iniLine = s.getLine(key);
+        if(iniLine == null) {
+            iniLine = new IniLine();
+        }
+        iniLine.setKey(key);
+        iniLine.setValue(value);
+    }
+    
 
     public final void setData(String sourceIniData) {
         clear();
