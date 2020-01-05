@@ -60,21 +60,25 @@ public class Ini {
     public final char getCommentChar() {
         return commentChar;
     }
-    
+
     public final void set(String section, String key, String value) {
-        IniSection s = getSection(section);
-        if(s == null) {
+        IniSection s;
+        if (section == null) {
             s = getGlobalSection();
+        } else {
+            s = getSection(section);
+            if(s==null) {
+                s = new IniSection(section);
+            }
         }
-        
+
         IniLine iniLine = s.getLine(key);
-        if(iniLine == null) {
+        if (iniLine == null) {
             iniLine = new IniLine();
         }
         iniLine.setKey(key);
         iniLine.setValue(value);
     }
-    
 
     public final void setData(String sourceIniData) {
         clear();
@@ -289,9 +293,9 @@ public class Ini {
     public final void clearComment() {
         getGlobalSection().clearComment();
 
-        for (final IniSection s : sections) {
+        sections.stream().forEach((s) -> {
             s.clearComment();
-        }
+        });
     }
 
     public final void clearEmpty() {
