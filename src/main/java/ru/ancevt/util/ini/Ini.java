@@ -1,9 +1,22 @@
 package ru.ancevt.util.ini;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import ru.ancevt.util.SimpleFileReader;
 
 public class Ini {
+
+    public static void main(String[] args) throws IOException, CloneNotSupportedException {
+        final String o = SimpleFileReader.readUtf8(new File("src/main/resources/example.ini"));
+        final Ini ini1 = new Ini(o);
+        final Ini ini2 = ini1.clone();
+
+        System.out.println(ini2.stringify('#', true));
+
+        System.out.println(ini1.getBoolean("SQLite", "enabled"));
+    }
 
     private IniSection globalSection;
     private List<IniSection> sections;
@@ -67,7 +80,7 @@ public class Ini {
             s = getGlobalSection();
         } else {
             s = getSection(section);
-            if(s==null) {
+            if (s == null) {
                 s = new IniSection(section);
             }
         }
@@ -304,6 +317,11 @@ public class Ini {
         sections.stream().forEach((s) -> {
             s.clearEmpty();
         });
+    }
+
+    @Override
+    protected Ini clone() throws CloneNotSupportedException {
+        return new Ini(this.stringify());
     }
 
 }
