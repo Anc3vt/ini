@@ -206,6 +206,17 @@ public class Ini {
         IniSection.ignoreCase = false;
         return line != null;
     }
+    
+    public final boolean isEmpty(String sectionName, String key) {
+        final IniSection section = sectionName == null ? getGlobalSection() : getSection(sectionName);
+        if (section == null) {
+            return false;
+        }
+        IniSection.ignoreCase = ignoreCase;
+        final IniLine line = section.getLine(key);
+        IniSection.ignoreCase = false;
+        return line != null && line.getValue().trim().isEmpty();
+    }
 
     public final String getString(String sectionName, String key) {
         final IniSection section = sectionName == null ? getGlobalSection() : getSection(sectionName);
