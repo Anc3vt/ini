@@ -58,11 +58,11 @@ public final class IniParser {
 
     }
 
-    private static final boolean isLineEmpty(String line) {
+    private static boolean isLineEmpty(String line) {
         return line.trim().length() == 0;
     }
 
-    private final void parseLine(String line) {
+    private void parseLine(String line) {
         final String delimiter = Character.toString(IniChar.EQUALS); // =
 
         final IniLine iniLine = new IniLine();
@@ -70,7 +70,7 @@ public final class IniParser {
         if (!isLineEmpty(line) && !line.contains(delimiter)) {
             throw new IniException(String.format("There is no '=' char in line \"%s\"", line));
         } else {
-            final String[] s = line.split(delimiter);
+            final String[] s = line.split(delimiter, 2);
             final String left = s[0].trim();
             final String right = s.length > 1 ? s[1] : "";//.trim();
             iniLine.setKey(left);
@@ -80,13 +80,13 @@ public final class IniParser {
         section.addLine(iniLine);
     }
 
-    private final void parseCommentLine(String line) {
+    private void parseCommentLine(String line) {
         final String commentText = line.trim().substring(1).trim();
         final IniLine iniLine = new IniLine(commentText);
         section.addLine(iniLine);
     }
 
-    private final void parseSectionLine(String line) {
+    private void parseSectionLine(String line) {
         line = line.trim();
         final String sectionName = line.substring(1, line.length() - 1);
         section = new IniSection(sectionName);

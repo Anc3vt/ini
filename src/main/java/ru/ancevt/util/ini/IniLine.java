@@ -36,7 +36,8 @@ public class IniLine {
     }
 
     public final void clear() {
-        this.key = this.value = this.comment = new String();
+        this.key = this.comment = new String();
+        this.value = null;
     }
 
     public final String stringify(char commentChar) {

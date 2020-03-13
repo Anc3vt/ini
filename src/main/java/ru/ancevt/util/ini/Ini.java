@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import ru.ancevt.util.SimpleFileReader;
+import ru.ancevt.util.fs.SimpleFileReader;
 
 public class Ini {
 
@@ -15,7 +15,7 @@ public class Ini {
 
         System.out.println(ini2.stringify('#', true));
 
-        System.out.println(ini1.getBoolean("SQLite", "enabled"));
+        System.out.println(ini1.isEmptyOrUnexists("RestApiJson", "url"));
     }
 
     private IniSection globalSection;
@@ -88,6 +88,7 @@ public class Ini {
         IniLine iniLine = s.getLine(key);
         if (iniLine == null) {
             iniLine = new IniLine();
+            s.addLine(iniLine);
         }
         iniLine.setKey(key);
         iniLine.setValue(value);
@@ -215,7 +216,24 @@ public class Ini {
         IniSection.ignoreCase = ignoreCase;
         final IniLine line = section.getLine(key);
         IniSection.ignoreCase = false;
-        return line != null && line.getValue().trim().isEmpty();
+        
+        return line.getValue().trim().isEmpty();
+    }
+    
+    public final boolean isExistAndNotEmpty(String sectionName, String key) {
+        return !isEmptyOrUnexists(sectionName, key);
+    }
+    
+    public final boolean isEmptyOrUnexists(String sectionName, String key) {
+        final IniSection section = sectionName == null ? getGlobalSection() : getSection(sectionName);
+        if (section == null) {
+            return false;
+        }
+        IniSection.ignoreCase = ignoreCase;
+        final IniLine line = section.getLine(key);
+        IniSection.ignoreCase = false;
+        return line == null || line.getValue().trim().isEmpty();
+        
     }
 
     public final String getString(String sectionName, String key) {
@@ -246,72 +264,73 @@ public class Ini {
 
     public final int getInt(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Integer.parseInt(result);
+        return Integer.parseInt(result.trim());
     }
 
     public final int getInt(String sectionName, String key, int defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Integer.parseInt(result);
+        if(result != null && result.trim().isEmpty()) return defaultValue;
+        return Integer.parseInt(result.trim());
     }
 
     public final boolean getBoolean(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Boolean.parseBoolean(result);
+        return Boolean.parseBoolean(result.trim());
     }
 
     public final boolean getBoolean(String sectionName, String key, boolean defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Boolean.parseBoolean(result);
+        return Boolean.parseBoolean(result.trim());
     }
 
     public final float getFloat(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Float.parseFloat(result);
+        return Float.parseFloat(result.trim());
     }
 
     public final float getFloat(String sectionName, String key, float defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Float.parseFloat(result);
+        return Float.parseFloat(result.trim());
     }
 
     public final double getDouble(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Double.parseDouble(result);
+        return Double.parseDouble(result.trim());
     }
 
     public final double getDouble(String sectionName, String key, double defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Double.parseDouble(result);
+        return Double.parseDouble(result.trim());
     }
 
     public final long getLong(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Long.parseLong(result);
+        return Long.parseLong(result.trim());
     }
 
     public final long getLong(String sectionName, String key, long defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Long.parseLong(result);
+        return Long.parseLong(result.trim());
     }
 
     public final short getShort(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Short.parseShort(result);
+        return Short.parseShort(result.trim());
     }
 
     public final short getShort(String sectionName, String key, short defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Short.parseShort(result);
+        return Short.parseShort(result.trim());
     }
 
     public final byte getByte(String sectionName, String key) {
         final String result = getString(sectionName, key);
-        return Byte.parseByte(result);
+        return Byte.parseByte(result.trim());
     }
 
     public final byte getByte(String sectionName, String key, byte defaultValue) {
         final String result = getString(sectionName, key, String.valueOf(defaultValue));
-        return Byte.parseByte(result);
+        return Byte.parseByte(result.trim());
     }
 
     public final void clearComment() {
