@@ -61,4 +61,14 @@ class IniTest {
         assertEquals(1, ini["Section1"]?.numRecords)
         assertFalse(ini["Section1"]?.containsKey("id")!!)
     }
+
+    @Test
+    fun testRecordsAsMap() {
+        val ini = Ini(TEST_CONTENT)
+
+        val map = ini.defaultSection.records;
+
+        assertEquals(2, map.size)
+        assertEquals("this is global value", map["global1"])
+    }
 }

@@ -5,7 +5,7 @@ import java.io.InputStream
 class Ini() {
 
     val defaultSection: Section = Section("__default_section__")
-    private val sections = mutableListOf<Section>()
+    val sections = mutableListOf<Section>()
 
     val numSections: Int
         get() {
@@ -100,6 +100,11 @@ class Ini() {
             get() {
                 return entries.count { it.key != null }
             }
+
+        val records: Map<String, String>
+            get() = entries
+                .filter { it.key != null && it.value != null }
+                .associate { it.key!! to it.value!! }
 
         operator fun get(key: String): String? {
             return entries.find { it.key == key }?.value
