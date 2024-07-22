@@ -3,6 +3,7 @@ package com.ancevt.ini
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class IniTest {
 
@@ -70,5 +71,22 @@ class IniTest {
 
         assertEquals(2, map.size)
         assertEquals("this is global value", map["global1"])
+    }
+
+    @Test
+    fun testGetTyped() {
+        val ini = Ini(TEST_CONTENT)
+
+        val l = ini["Section2"]?.getLong("long")
+        val i = ini["Section2"]?.getInt("int")
+        val f = ini["Section2"]?.getFloat("float")
+        val d = ini["Section2"]?.getDouble("double")
+        val b = ini["Section2"]?.getBoolean("boolean")
+
+        assertEquals(120, i)
+        assertEquals(120L, l)
+        assertEquals(120.1f, f)
+        assertEquals(120.1, d)
+        assertTrue(b!!)
     }
 }

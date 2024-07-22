@@ -110,7 +110,58 @@ class Ini() {
             return entries.find { it.key == key }?.value
         }
 
-        fun put(key: String, value: String):Section {
+        fun getInt(key: String, default: Int = 0): Int {
+            if (this[key] != null) {
+                return try {
+                    this[key]?.toInt()!!
+                } catch (e: NumberFormatException) {
+                    default
+                }
+            }
+            return default
+        }
+
+        fun getDouble(key: String, default: Double = 0.0): Double {
+            if (this[key] != null) {
+                return try {
+                    this[key]?.toDouble()!!
+                } catch (e: NumberFormatException) {
+                    default
+                }
+            }
+            return default
+        }
+
+        fun getFloat(key: String, default: Float = 0.0f): Float {
+            if (this[key] != null) {
+                return try {
+                    this[key]?.toFloat()!!
+                } catch (e: NumberFormatException) {
+                    default
+                }
+            }
+            return default
+        }
+
+        fun getLong(key: String, default: Long = 0L): Long {
+            if (this[key] != null) {
+                return try {
+                    this[key]?.toLong()!!
+                } catch (e: NumberFormatException) {
+                    default
+                }
+            }
+            return default
+        }
+
+        fun getBoolean(key: String, default: Boolean = false): Boolean {
+            if (this[key] != null) {
+                return this[key]?.toBoolean()!!
+            }
+            return default
+        }
+
+        fun put(key: String, value: String): Section {
             if (containsKey(key)) {
                 entries.find { it.key == key }?.value = value
             } else {
@@ -119,12 +170,12 @@ class Ini() {
             return this
         }
 
-        fun createEmptyLine():Section {
+        fun createEmptyLine(): Section {
             entries.add(Entry(null, null, isComment = false, isEmpty = true))
             return this
         }
 
-        fun createComment(comment:String):Section {
+        fun createComment(comment: String): Section {
             entries.add(Entry(null, comment, isComment = true, isEmpty = false))
             return this
         }
