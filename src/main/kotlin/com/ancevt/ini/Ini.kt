@@ -2,15 +2,14 @@ package com.ancevt.ini
 
 import java.io.InputStream
 
-class Ini() {
+open class Ini() {
 
-    val defaultSection: Section = Section("__default_section__")
+    val topLevelSection: Section = Section("__top_level_section__")
     val sections = mutableListOf<Section>()
 
-    val numSections: Int
-        get() {
-            return sections.size
-        }
+    val sectionsIncludingTopLevel: Collection<Section> get() = listOf(topLevelSection) + sections
+
+    val numSections: Int get() = sections.size
 
     constructor(inputStream: InputStream) : this() {
         val content = inputStream.bufferedReader(Charsets.UTF_8).readText()
@@ -22,32 +21,40 @@ class Ini() {
     }
 
     private fun parse(content: String) {
-        var section = defaultSection
+        var section = topLevelSection
 
-        content.lines().forEach {
+        content.lines().forEachIndexed { index, it ->
             val line = it.trimStart()
+            val lineNumber = index + 1
 
-            if (line.startsWith("[")) {
+            if (line.startsWith("[") && line.trim().endsWith("]")) {
                 val sectionName = line.substring(1, line.length - 1).trim()
 
-                section = Section(sectionName)
-                sections.add(section)
+                if (sectionName.contains("[") || sectionName.contains("]"))
+                    throw IniException("Invalid section definition at line $lineNumber: $line")
 
+                section = getOrCreateSection(sectionName)
             } else if (line.trim().isBlank()) {
                 section.entries.add(Entry(null, null, false, true))
-
             } else if (line.startsWith(";") || line.startsWith("#")) {
-                val value = line.substring(1)
-                section.entries.add(Entry(null, value, true, false))
-
+                val value = line.substring(1).trim()
+                section.entries.add(Entry(null, value, true, false, line[0]))
             } else if (line.contains("=")) {
                 val split = line.split("=", limit = 2)
                 val key = split[0].trim()
                 val value = split[1].trimStart()
-                section.entries.add(Entry(key, value, false, false))
 
+                if (key.isBlank()) throw IniException("Blank key at line $lineNumber: $line")
+
+                section.entries.add(Entry(key, value, false, false))
+            } else {
+                throw IniException("Parse error at line $lineNumber: $line")
             }
         }
+    }
+
+    private fun getOrCreateSection(sectionName: String): Section {
+        return sections.find { it.name == sectionName } ?: Section(sectionName).also { sections.add(it) }
     }
 
     operator fun get(sectionName: String): Section? {
@@ -74,13 +81,13 @@ class Ini() {
 
     override fun toString(): String {
         val sb = StringBuilder()
-        appendSectionToStringBuilder(defaultSection, sb)
+        appendSectionToStringBuilder(topLevelSection, sb)
         sections.forEach { appendSectionToStringBuilder(it, sb) }
         return sb.toString()
     }
 
     private fun appendSectionToStringBuilder(section: Section, sb: StringBuilder) {
-        if (section != defaultSection) sb.appendLine("[${section.name}]")
+        if (section != topLevelSection) sb.appendLine("[${section.name}]")
 
         section.entries.forEach { entry ->
             if (entry.isComment) {
@@ -110,55 +117,36 @@ class Ini() {
             return entries.find { it.key == key }?.value
         }
 
+        fun getByte(key: String, default: Byte = 0): Byte {
+            return this[key]?.toByteOrNull() ?: default
+        }
+
+        fun getShort(key: String, default: Short = 0): Short {
+            return this[key]?.toShortOrNull() ?: default
+        }
+
+        fun getChar(key: String, default: Char = '?'): Char {
+            return this[key]?.toCharArray()?.get(0) ?: default
+        }
+
         fun getInt(key: String, default: Int = 0): Int {
-            if (this[key] != null) {
-                return try {
-                    this[key]?.toInt()!!
-                } catch (e: NumberFormatException) {
-                    default
-                }
-            }
-            return default
+            return this[key]?.toIntOrNull() ?: default
         }
 
         fun getDouble(key: String, default: Double = 0.0): Double {
-            if (this[key] != null) {
-                return try {
-                    this[key]?.toDouble()!!
-                } catch (e: NumberFormatException) {
-                    default
-                }
-            }
-            return default
+            return this[key]?.toDoubleOrNull() ?: default
         }
 
         fun getFloat(key: String, default: Float = 0.0f): Float {
-            if (this[key] != null) {
-                return try {
-                    this[key]?.toFloat()!!
-                } catch (e: NumberFormatException) {
-                    default
-                }
-            }
-            return default
+            return this[key]?.toFloatOrNull() ?: default
         }
 
         fun getLong(key: String, default: Long = 0L): Long {
-            if (this[key] != null) {
-                return try {
-                    this[key]?.toLong()!!
-                } catch (e: NumberFormatException) {
-                    default
-                }
-            }
-            return default
+            return this[key]?.toLongOrNull() ?: default
         }
 
         fun getBoolean(key: String, default: Boolean = false): Boolean {
-            if (this[key] != null) {
-                return this[key]?.toBoolean()!!
-            }
-            return default
+            return this[key]?.toBoolean() ?: default
         }
 
         fun put(key: String, value: String): Section {
@@ -196,14 +184,17 @@ class Ini() {
     data class Entry(
         val key: String?,
         var value: String?,
-        val isComment: Boolean,
-        val isEmpty: Boolean
+        val isComment: Boolean = false,
+        val isEmpty: Boolean = false,
+        val commentChar: Char = ';'
     ) {
 
         override fun toString(): String {
             if (isEmpty) return ""
 
-            return if (isComment) ";$value" else "$key = $value"
+            return if (isComment) "$commentChar$value" else "$key=$value"
         }
     }
+
+    class IniException(message: String) : Exception(message)
 }

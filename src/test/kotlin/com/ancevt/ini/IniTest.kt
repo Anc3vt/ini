@@ -2,6 +2,7 @@ package com.ancevt.ini
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -18,28 +19,31 @@ class IniTest {
     @Test
     fun testRuntimeBuildIni() {
         val ini = Ini()
-        ini.defaultSection
-            .put("testKey", "testValue")
-            .createEmptyLine();
+        ini.topLevelSection.apply {
+            put("testKey", "testValue")
+            createEmptyLine();
+        }
 
-        ini.createSection("Section 1")
-            .put("key1", "value1")
-            .put("key2", "value2")
-            .createEmptyLine()
-            .createComment(" This is a comment")
-            .put("key3", "value3")
-            .put("key4", "value4")
+        ini.createSection("Section 1").apply {
+            put("key1", "value1")
+            put("key2", "value2")
+            createEmptyLine()
+            createComment(" This is a comment")
+            put("key3", "value3")
+            put("key4", "value4")
+        }
 
-        ini.createSection("Section 2")
-            .put("key1", "value1")
-            .put("key2", "value2")
-            .createEmptyLine()
-            .createComment(" This is a comment")
-            .put("checkMeKey", "checkMeValue")
-            .put("key3", "value3")
-            .put("key4", "value4")
+        ini.createSection("Section 2").apply {
+            put("key1", "value1")
+            put("key2", "value2")
+            createEmptyLine()
+            createComment(" This is a comment")
+            put("checkMeKey", "checkMeValue")
+            put("key3", "value3")
+            put("key4", "value4")
+        }
 
-        assertEquals("testValue", ini.defaultSection["testKey"])
+        assertEquals("testValue", ini.topLevelSection["testKey"])
         assertEquals("checkMeValue", ini["Section 2"]?.get("checkMeKey"))
     }
 
@@ -67,7 +71,7 @@ class IniTest {
     fun testRecordsAsMap() {
         val ini = Ini(TEST_CONTENT)
 
-        val map = ini.defaultSection.records;
+        val map = ini.topLevelSection.records;
 
         assertEquals(2, map.size)
         assertEquals("this is global value", map["global1"])
@@ -88,5 +92,39 @@ class IniTest {
         assertEquals(120.1f, f)
         assertEquals(120.1, d)
         assertTrue(b!!)
+    }
+
+    @Test
+    fun testFails() {
+        assertFails { Ini("123") }
+        assertFails { Ini("=") }
+        assertFails { Ini(" = = = ") }
+        assertFails { Ini("[UnclosedSection") }
+        assertFails { Ini("[UnclosedSection]]") }
+    }
+
+    @Test
+    fun testDuplicateSections() {
+        val ini = Ini(
+            """
+            [Section1]
+            A=1
+            B=2
+            [Section2]
+            A=1
+            B=2
+            [Section1]
+            C=1
+        """.trimIndent()
+        )
+
+        println(ini)
+    }
+
+    @Test
+    fun testIterateOverAll() {
+        val ini = Ini(TEST_CONTENT)
+
+        println(ini)
     }
 }
